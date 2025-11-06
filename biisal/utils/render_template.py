@@ -9,17 +9,21 @@ import logging
 import aiohttp
 import jinja2
 
-async def render_page(id, secure_hash, src=None):
+async def render_page(id, secure_hash=None, src=None):
     file = await StreamBot.get_messages(int(Var.BIN_CHANNEL), int(id))
     file_data = await get_file_ids(StreamBot, int(Var.BIN_CHANNEL), int(id))
-    if file_data.unique_id[:6] != secure_hash:
+    # Only validate hash if provided. If you remove hash from links, this allows access by id+filename.
+    if secure_hash and file_data.unique_id[:6] != secure_hash:
         logging.debug(f"link hash: {secure_hash} - {file_data.unique_id[:6]}")
         logging.debug(f"Invalid hash for message with - ID {id}")
         raise InvalidHash
 
+    # Build src without any query string (we won't include ?hash in the URL)
+    # Validation still happens if a secure_hash is provided, but the public URL
+    # will be in the form: {URL}/{id}/{filename}
     src = urllib.parse.urljoin(
         Var.URL,
-        f"{id}/{urllib.parse.quote_plus(file_data.file_name)}?hash={secure_hash}",
+        f"{id}/{urllib.parse.quote_plus(file_data.file_name)}",
     )
 
     tag = file_data.mime_type.split("/")[0].strip()
