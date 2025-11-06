@@ -39,7 +39,7 @@ class Var(object):
         ON_HEROKU = False
     FQDN = str(getenv('FQDN', 'links.k-l.cloud')) if not ON_HEROKU or getenv('FQDN', '') else APP_NAME + '.herokuapp.com'
     # SSL is enabled by default for this deployment
-    HAS_SSL = is_enabled(getenv('HAS_SSL', 'true'), True)
+    HAS_SSL = is_enabled(getenv('HAS_SSL', 'false'), False)
     if HAS_SSL:
         URL = "https://{}/".format(FQDN)
     else:
@@ -52,3 +52,4 @@ class Var(object):
     SHORTLINK = is_enabled(getenv('SHORTLINK', 'false'), False)
     SHORTLINK_URL = getenv('SHORTLINK_URL', '')
     SHORTLINK_API = getenv('SHORTLINK_API', '')
+
