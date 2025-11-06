@@ -43,7 +43,7 @@ class Var(object):
         URL = "https://{}/".format(FQDN)
     else:
         URL = "http://{}/".format(FQDN)
-    DATABASE_URL = str(getenv('DATABASE_URL', 'mongodb+srv://king:139715202Aa@cluster0.v6q7yyu.mongodb.net/?appName=Cluster0'))
+    DATABASE_URL = str(getenv('DATABASE_URL', 'mongodb+srv://king:139715202Aa@cluster0.kmklgzs.mongodb.net/?appName=Cluster0'))
     UPDATES_CHANNEL = str(getenv('UPDATES_CHANNEL', 'None')) 
     BANNED_CHANNELS = list(set(int(x) for x in str(getenv("BANNED_CHANNELS", "")).split()))   
     BAN_CHNL = list(set(int(x) for x in str(getenv("BAN_CHNL", "")).split()))   
@@ -51,3 +51,4 @@ class Var(object):
     SHORTLINK = is_enabled('SHORTLINK', False)
     SHORTLINK_URL = getenv('SHORTLINK_URL', '')
     SHORTLINK_API = getenv('SHORTLINK_API', '')
+
