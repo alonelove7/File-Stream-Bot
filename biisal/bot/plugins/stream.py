@@ -127,12 +127,16 @@ async def private_receive_handler(c: Client, m: Message):
 
             pretty_download = f"{Var.URL}{alias}"
 
+            # Use the actual online link (which includes the 6-char hash prefix)
+            # for the download button so server-side hash validation succeeds.
+            # If SHORTLINK is enabled, shorten the real online_link instead of
+            # shortening the alias-only URL.
             if Var.SHORTLINK:
                 stream = get_shortlink(stream_link)
-                download = get_shortlink(pretty_download)
+                download = get_shortlink(online_link)
             else:
                 stream = stream_link
-                download = pretty_download
+                download = online_link
             # Ensure any query string (like ?hash=...) is removed from final links
             try:
                 if isinstance(stream, str):
