@@ -17,18 +17,18 @@ class Var(object):
     MULTI_CLIENT = False
     API_ID = int(getenv('API_ID', '124226'))
     API_HASH = str(getenv('API_HASH', '29fb5cf576f23d41cd61f9de5763dd34'))
-    BOT_TOKEN = str(getenv('BOT_TOKEN' , '7089961764:AAGG_QM8YSmkYBTJIT40B_rHRsG3U56ClCg'))
+    BOT_TOKEN = str(getenv('BOT_TOKEN' , '8308721617:AAFcnFEwC3BZhrhGtyy867z-Pr7WKlsE-6w'))
     PICS = (environ.get('PICS', 'https://envs.sh/jUp.jpg')).split()
     name = str(getenv('name', 'linkstreamrobot'))
     SLEEP_THRESHOLD = int(getenv('SLEEP_THRESHOLD', '60'))
     WORKERS = int(getenv('WORKERS', '4'))
     BIN_CHANNEL = int(getenv('BIN_CHANNEL', '-1001255392605'))
     NEW_USER_LOG = int(getenv('NEW_USER_LOG', '-1001255392605'))
-    PORT = int(getenv('PORT', '80'))
+    PORT = int(getenv('PORT', '8080'))
     BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', '0.0.0.0'))
     PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))  # 20 minutes
     OWNER_ID = [int(x) for x in os.environ.get("OWNER_ID", "5324263057").split()]
-    NO_PORT = is_enabled(getenv('NO_PORT', 'true'), True)
+    NO_PORT = bool(getenv('NO_PORT', True))
     APP_NAME = None
     OWNER_USERNAME = str(getenv('OWNER_USERNAME', 'AmirMossein'))
     if 'DYNO' in environ:
@@ -37,8 +37,7 @@ class Var(object):
     
     else:
         ON_HEROKU = False
-    FQDN = str(getenv('FQDN', 'links.k-l.cloud')) if not ON_HEROKU or getenv('FQDN', '') else APP_NAME + '.herokuapp.com'
-    # SSL is enabled by default for this deployment
+    FQDN = str(getenv('FQDN', 'gogo.k-l.cloud')) if not ON_HEROKU or getenv('FQDN', '') else APP_NAME + '.herokuapp.com'
     HAS_SSL = is_enabled(getenv('HAS_SSL', 'false'), False)
     if HAS_SSL:
         URL = "https://{}/".format(FQDN)
@@ -49,8 +48,6 @@ class Var(object):
     BANNED_CHANNELS = list(set(int(x) for x in str(getenv("BANNED_CHANNELS", "")).split()))   
     BAN_CHNL = list(set(int(x) for x in str(getenv("BAN_CHNL", "")).split()))   
     BAN_ALERT = str(getenv('BAN_ALERT' , '<b>ʏᴏᴜʀ ᴀʀᴇ ʙᴀɴɴᴇᴅ ᴛᴏ ᴜsᴇ ᴛʜɪs ʙᴏᴛ.ᴄᴏɴᴛᴀᴄᴛ @CallOwnerBot ᴛᴏ ʀᴇsᴏʟᴠᴇ ᴛʜᴇ ɪssᴜᴇ!!</b>'))
-    SHORTLINK = is_enabled(getenv('SHORTLINK', 'false'), False)
+    SHORTLINK = is_enabled('SHORTLINK', False)
     SHORTLINK_URL = getenv('SHORTLINK_URL', '')
     SHORTLINK_API = getenv('SHORTLINK_API', '')
-
-
