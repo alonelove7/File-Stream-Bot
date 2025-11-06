@@ -45,7 +45,12 @@ async def root_route_handler(_):
 async def stream_handler(request: web.Request):
     try:
         path = request.match_info["path"]
-        match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)$", path)
+        # Support an optional 6-char secure hash prefix before the id even when
+        # the path contains a filename after the id. Examples supported:
+        #  - /watch/ABCDEF12345
+        #  - /watch/ABCDEF12345/filename.mp4
+        # If the prefix is not present, fall back to reading ?hash= from query.
+        match = re.search(r"^([a-zA-Z0-9_-]{6})?(\d+)(?:\/\S+)?$", path)
         if match:
             secure_hash = match.group(1)
             id = int(match.group(2))
@@ -67,7 +72,8 @@ async def stream_handler(request: web.Request):
 async def stream_handler(request: web.Request):
     try:
         path = request.match_info["path"]
-        match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)$", path)
+        # Same behavior as /watch route: allow optional 6-char prefix before id
+        match = re.search(r"^([a-zA-Z0-9_-]{6})?(\d+)(?:\/\S+)?$", path)
         if match:
             secure_hash = match.group(1)
             id = int(match.group(2))
