@@ -66,22 +66,8 @@ async def start(b, m):
                 
                 disable_web_page_preview=True)
             return
-    await StreamBot.send_photo(
-    chat_id=m.chat.id,
-    photo=random.choice(Var.PICS),
-    caption= TechifyBots.format(m.from_user.mention(style="md")),
-    reply_markup=InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("• ᴀʙᴏᴜᴛ •", callback_data="about"),
-                        InlineKeyboardButton("• ʜᴇʟᴘ •", callback_data="help")
-                    ],
-                    [
-                        InlineKeyboardButton("♻ ᴅᴇᴠᴇʟᴏᴘᴇʀ ♻", url="https://telegram.me/TechifyRahul")
-                    ]
-                ]
-            )
-)
+    # Send a simple start text as requested
+    await b.send_message(chat_id=m.chat.id, text="send your file")
 
 @StreamBot.on_message(filters.command("help") & filters.private )
 async def help_cd(b, m):
@@ -196,20 +182,8 @@ async def cb_handler(client, query):
 
 
     if data == "start":
-        await query.message.edit_caption(
-        caption= TechifyBots.format(query.from_user.mention(style="md")),
-        reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton("• ᴀʙᴏᴜᴛ •", callback_data="about"),
-                            InlineKeyboardButton("• ʜᴇʟᴘ •", callback_data="help")
-                        ],
-                        [
-                            InlineKeyboardButton("♻ ᴅᴇᴠᴇʟᴏᴘᴇʀ ♻", url="https://telegram.me/TechifyRahul")
-                        ]
-                    ]
-                )
-        )
+        # Edit to the simple start text as well
+        await query.message.edit_text(text="send your file")
 
     elif data == "about":
         await query.message.edit_caption(
