@@ -96,9 +96,13 @@ async def private_receive_handler(c: Client, m: Message):
 
     try:  # This is the outer try block
         log_msg = await m.copy(chat_id=Var.BIN_CHANNEL)
-        # Generate links without hash parameter; filename included in path
-        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
-        online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
+        # Generate links and include the 6-char secure hash prefix in the path
+        # instead of using a query parameter (so final links don't look like
+        # .../file.mp4?hash=XXXXX). get_hash() returns the first 6 chars of
+        # file_unique_id.
+        short_hash = get_hash(log_msg)
+        stream_link = f"{Var.URL}watch/{short_hash}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
+        online_link = f"{Var.URL}{short_hash}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
         try:  # This is the inner try block
             # Create a vanity alias for filename (url-safe). If collision occurs, append message id.
             alias = quote_plus(get_name(log_msg))
@@ -183,9 +187,10 @@ async def channel_receive_handler(bot, broadcast):
         return
     try:  # This is the outer try block
         log_msg = await broadcast.forward(chat_id=Var.BIN_CHANNEL)
-        # Generate links without hash parameter; filename included in path
-        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
-        online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
+        # Generate links and include the 6-char secure hash prefix in the path
+        short_hash = get_hash(log_msg)
+        stream_link = f"{Var.URL}watch/{short_hash}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
+        online_link = f"{Var.URL}{short_hash}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
         try:  # This is the inner try block
             if Var.SHORTLINK:
                 stream = get_shortlink(stream_link)
