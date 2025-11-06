@@ -18,13 +18,17 @@ async def render_page(id, secure_hash=None, src=None):
         logging.debug(f"Invalid hash for message with - ID {id}")
         raise InvalidHash
 
-    # Build src without any query string (we won't include ?hash in the URL)
-    # Validation still happens if a secure_hash is provided, but the public URL
-    # will be in the form: {URL}/{id}/{filename}
-    src = urllib.parse.urljoin(
-        Var.URL,
-        f"{id}/{urllib.parse.quote_plus(file_data.file_name)}",
-    )
+    # Build src without hash when secure_hash is not provided
+    if secure_hash:
+        src = urllib.parse.urljoin(
+            Var.URL,
+            f"{id}/{urllib.parse.quote_plus(file_data.file_name)}?hash={secure_hash}",
+        )
+    else:
+        src = urllib.parse.urljoin(
+            Var.URL,
+            f"{id}/{urllib.parse.quote_plus(file_data.file_name)}",
+        )
 
     tag = file_data.mime_type.split("/")[0].strip()
     file_size = humanbytes(file_data.file_size)
