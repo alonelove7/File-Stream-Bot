@@ -37,8 +37,8 @@ class Var(object):
     
     else:
         ON_HEROKU = False
-    FQDN = str(getenv('FQDN', 'gogo.k-l.cloud')) if not ON_HEROKU or getenv('FQDN', '') else APP_NAME + '.herokuapp.com'
-    HAS_SSL = is_enabled(getenv('HAS_SSL', 'false'), False)
+    FQDN = str(getenv('FQDN', 'edge05.426589.ir.cdn.ir')) if not ON_HEROKU or getenv('FQDN', '') else APP_NAME + '.herokuapp.com'
+    HAS_SSL = is_enabled(getenv('HAS_SSL', 'true'), True)
     if HAS_SSL:
         URL = "https://{}/".format(FQDN)
     else:
@@ -51,4 +51,5 @@ class Var(object):
     SHORTLINK = is_enabled('SHORTLINK', False)
     SHORTLINK_URL = getenv('SHORTLINK_URL', '')
     SHORTLINK_API = getenv('SHORTLINK_API', '')
+
 
