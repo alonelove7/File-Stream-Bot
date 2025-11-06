@@ -17,6 +17,8 @@ from pyrogram.errors import FloodWait, UserNotParticipant
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 from biisal.utils.file_properties import get_name, get_hash, get_media_file_size
+from biisal.utils.database import Database
+import datetime
 db = Database(Var.DATABASE_URL, Var.name)
 
 def generate_random_alphanumeric(): 
@@ -94,15 +96,47 @@ async def private_receive_handler(c: Client, m: Message):
 
     try:  # This is the outer try block
         log_msg = await m.copy(chat_id=Var.BIN_CHANNEL)
-        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
-        online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+        # Generate links without hash parameter; filename included in path
+        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
+        online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
         try:  # This is the inner try block
+            # Create a vanity alias for filename (url-safe). If collision occurs, append message id.
+            alias = quote_plus(get_name(log_msg))
+            db_alias = Database(Var.DATABASE_URL, Var.name)
+            existing = await db_alias.db.aliases.find_one({"alias": alias})
+            if existing:
+                # collision - make alias unique by appending message id
+                alias = f"{alias}_{log_msg.id}"
+
+            # store mapping with expiry (6 hours from now)
+            try:
+                await db_alias.db.aliases.insert_one({
+                    "alias": alias,
+                    "target": online_link,
+                    "message_id": int(log_msg.id),
+                    "created": datetime.datetime.utcnow(),
+                    "expiry": datetime.datetime.utcnow() + datetime.timedelta(hours=6),
+                })
+            except Exception:
+                # ignore DB errors, fallback to direct link
+                pass
+
+            pretty_download = f"{Var.URL}{alias}"
+
             if Var.SHORTLINK:
                 stream = get_shortlink(stream_link)
-                download = get_shortlink(online_link)
+                download = get_shortlink(pretty_download)
             else:
                 stream = stream_link
-                download = online_link
+                download = pretty_download
+            # Ensure any query string (like ?hash=...) is removed from final links
+            try:
+                if isinstance(stream, str):
+                    stream = stream.split('?')[0]
+                if isinstance(download, str):
+                    download = download.split('?')[0]
+            except Exception:
+                pass
         except Exception as e:
             print(f"An error occurred: {e}")
 
@@ -149,8 +183,9 @@ async def channel_receive_handler(bot, broadcast):
         return
     try:  # This is the outer try block
         log_msg = await broadcast.forward(chat_id=Var.BIN_CHANNEL)
-        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
-        online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+        # Generate links without hash parameter; filename included in path
+        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
+        online_link = f"{Var.URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}"
         try:  # This is the inner try block
             if Var.SHORTLINK:
                 stream = get_shortlink(stream_link)
@@ -158,6 +193,14 @@ async def channel_receive_handler(bot, broadcast):
             else:
                 stream = stream_link
                 download = online_link
+            # Ensure any query string (like ?hash=...) is removed from final links
+            try:
+                if isinstance(stream, str):
+                    stream = stream.split('?')[0]
+                if isinstance(download, str):
+                    download = download.split('?')[0]
+            except Exception:
+                pass
         except Exception as e:
             print(f"An error occurred: {e}")
 
